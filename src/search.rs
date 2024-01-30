@@ -45,10 +45,10 @@ struct Query<'a> {
 }
 
 impl<'a> Query<'a> {
-	fn new(page: &str) -> Query {
+	fn new(word: &str) -> Query {
 		Query {
 			action: "parse",
-			page,
+			page: word,
 			redirects: true,
 			prop: "langlinks",
 			format: "json",
@@ -57,14 +57,14 @@ impl<'a> Query<'a> {
 }
 
 impl WikiSearch {
-	pub fn search() -> color_eyre::Result<Self> {
+	pub fn search(word: &str, lang: &str) -> color_eyre::Result<Self> {
 		let reqwest = reqwest::blocking::Client::new();
-		let query = Query::new("chese");
+		let query = Query::new(word);
 
-		let url = url("en");
+		let url = url(lang);
 		let answer = reqwest.get(url).query(&query).send()?;
-		let req = answer.json::<WikiSearchTmp>()?;
-		Ok(req.parse)
+		let wiki = answer.json::<WikiSearchTmp>()?;
+		Ok(wiki.parse)
 	}
 
 	pub fn title(&self) -> &str {
