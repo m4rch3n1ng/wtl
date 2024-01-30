@@ -13,9 +13,6 @@ fn main() -> color_eyre::Result<()> {
 	let from = cli.from();
 	let into = cli.to();
 
-	let search = WikiSearch::search(word, from)?;
-	let entry = search.find(into);
-
 	println!(
 		"{} {} {} {}",
 		"translating from".italic().dimmed(),
@@ -23,6 +20,10 @@ fn main() -> color_eyre::Result<()> {
 		"into".italic().dimmed(),
 		into
 	);
+
+	let search = WikiSearch::search(word, from)?;
+	let entry = search.find(into);
+
 	if let Some(entry) = entry {
 		println!("::: {} :::", search.title());
 		println!("{}: {}", cli.to(), entry.name());
