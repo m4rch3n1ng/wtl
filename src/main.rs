@@ -1,3 +1,8 @@
+use search::WikiSearch;
+
+mod search;
+
 fn main() {
-	println!("Hello, world!");
+	let search = WikiSearch::search();
+	println!("search {:?}", search);
 }
