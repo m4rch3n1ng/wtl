@@ -1,5 +1,3 @@
-// https://en.wikipedia.org/w/api.php?action=parse&page=chese&redirects&prop=langlinks&format=json
-
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -12,6 +10,18 @@ pub struct WikiEntry {
 	lang: String,
 	#[serde(rename = "*")]
 	name: String,
+}
+
+impl WikiEntry {
+	pub fn name(&self) -> &str {
+		&self.name
+	}
+}
+
+impl PartialEq<str> for WikiEntry {
+	fn eq(&self, other: &str) -> bool {
+		self.lang == other
+	}
 }
 
 #[derive(Debug, Deserialize)]
@@ -47,24 +57,26 @@ impl<'a> Query<'a> {
 }
 
 impl WikiSearch {
-	pub fn search() -> Self {
+	pub fn search() -> color_eyre::Result<Self> {
 		let reqwest = reqwest::blocking::Client::new();
 		let query = Query::new("chese");
 
 		let url = url("en");
-		let answer = reqwest.get(&url).query(&query);
-		println!("rq {:?}", answer);
-
-		let answer = reqwest.get(url).query(&query).send().unwrap();
-		let req = answer.json::<WikiSearchTmp>().unwrap();
-		req.parse
+		let answer = reqwest.get(url).query(&query).send()?;
+		let req = answer.json::<WikiSearchTmp>()?;
+		Ok(req.parse)
 	}
 
 	pub fn title(&self) -> &str {
 		&self.title
 	}
 
-	pub fn langs(&self) -> &[WikiEntry] {
+	fn langs(&self) -> &[WikiEntry] {
 		&self.langlinks
+	}
+
+	pub fn find(&self, lang: &str) -> Option<&WikiEntry> {
+		let langs = self.langs();
+		langs.iter().find(|entry| entry == &lang)
 	}
 }
